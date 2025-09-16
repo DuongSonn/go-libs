@@ -3,9 +3,10 @@ package pgx
 import (
 	"context"
 	"fmt"
-	"go-libs/pkg/database/postgres/interfaces"
 	"reflect"
 	"strings"
+
+	"go-libs/pkg/database/postgres/interfaces"
 
 	"github.com/jackc/pgx/v5"
 )

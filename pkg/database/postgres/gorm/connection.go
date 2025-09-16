@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"go-libs/pkg/database/postgres/config"
+	_config "go-libs/pkg/database/postgres/config"
 	"go-libs/pkg/database/postgres/interfaces"
 
 	"gorm.io/driver/postgres"
@@ -20,11 +20,11 @@ var _ interfaces.GormClient = (*Connection)(nil)
 type Connection struct {
 	db     *gorm.DB
 	sqlDB  *sql.DB
-	config *config.GormConfig
+	config *_config.GormConfig
 }
 
 // NewConnection creates a new GORM connection
-func NewConnection(cfg *config.GormConfig) *Connection {
+func NewConnection(cfg *_config.GormConfig) *Connection {
 	return &Connection{
 		config: cfg,
 	}

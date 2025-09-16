@@ -1,4 +1,4 @@
-package errors
+package _errors
 
 // Language constants
 const (

@@ -1,4 +1,4 @@
-package logger
+package _logger
 
 import (
 	"context"

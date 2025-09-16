@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"go-libs/pkg/database/postgres/config"
+	_config "go-libs/pkg/database/postgres/config"
 	"go-libs/pkg/database/postgres/interfaces"
 
 	"github.com/jackc/pgx/v5"
@@ -18,11 +18,11 @@ var _ interfaces.PgxClient = (*Connection)(nil)
 type Connection struct {
 	pool   *pgxpool.Pool
 	conn   *pgx.Conn
-	config *config.Config
+	config *_config.Config
 }
 
 // NewConnection creates a new pgx connection
-func NewConnection(cfg *config.Config) *Connection {
+func NewConnection(cfg *_config.Config) *Connection {
 	return &Connection{
 		config: cfg,
 	}

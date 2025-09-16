@@ -1,4 +1,4 @@
-package errors
+package _errors
 
 // AppError represents an application error with code, message and HTTP status
 type AppError struct {
