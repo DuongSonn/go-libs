@@ -1,15 +1,15 @@
-package gorm
+package _gorm_postgres
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
-	"go-libs/pkg/database/postgres/interfaces"
+	_postgres "go-libs/pkg/postgres"
 )
 
 // BeginTx starts a new transaction
-func (c *Connection) BeginTx(ctx context.Context) (interfaces.Transaction, error) {
+func (c *Connection) BeginTx(ctx context.Context) (_postgres.Transaction, error) {
 	if c.db == nil {
 		return nil, fmt.Errorf("database not connected")
 	}
@@ -35,7 +35,7 @@ func (c *Connection) Exec(ctx context.Context, query string, args ...any) error 
 }
 
 // Query executes a query and returns rows
-func (c *Connection) Query(ctx context.Context, query string, args ...any) (interfaces.Rows, error) {
+func (c *Connection) Query(ctx context.Context, query string, args ...any) (_postgres.Rows, error) {
 	if c.db == nil {
 		return nil, fmt.Errorf("database not connected")
 	}
@@ -52,7 +52,7 @@ func (c *Connection) Query(ctx context.Context, query string, args ...any) (inte
 }
 
 // QueryRow executes a query and returns a single row
-func (c *Connection) QueryRow(ctx context.Context, query string, args ...any) interfaces.Row {
+func (c *Connection) QueryRow(ctx context.Context, query string, args ...any) _postgres.Row {
 	if c.db == nil {
 		return &RowWrapper{row: &sql.Row{}}
 	}

@@ -1,9 +1,9 @@
-package gorm
+package _gorm_postgres
 
 import (
 	"context"
 
-	"go-libs/pkg/database/postgres/interfaces"
+	_postgres "go-libs/pkg/postgres"
 
 	"gorm.io/gorm"
 )
@@ -29,7 +29,7 @@ func (t *Transaction) Exec(ctx context.Context, query string, args ...any) error
 }
 
 // Query executes a query and returns rows within transaction
-func (t *Transaction) Query(ctx context.Context, query string, args ...any) (interfaces.Rows, error) {
+func (t *Transaction) Query(ctx context.Context, query string, args ...any) (_postgres.Rows, error) {
 	rows, err := t.tx.WithContext(ctx).Raw(query, args...).Rows()
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (t *Transaction) Query(ctx context.Context, query string, args ...any) (int
 }
 
 // QueryRow executes a query and returns a single row within transaction
-func (t *Transaction) QueryRow(ctx context.Context, query string, args ...any) interfaces.Row {
+func (t *Transaction) QueryRow(ctx context.Context, query string, args ...any) _postgres.Row {
 	row := t.tx.WithContext(ctx).Raw(query, args...).Row()
 	return &RowWrapper{row: row}
 }

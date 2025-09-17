@@ -1,4 +1,4 @@
-package gorm
+package _gorm_postgres
 
 import (
 	"context"
@@ -6,25 +6,24 @@ import (
 	"fmt"
 	"time"
 
-	_config "go-libs/pkg/database/postgres/config"
-	"go-libs/pkg/database/postgres/interfaces"
+	_postgres "go-libs/pkg/postgres"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-var _ interfaces.GormClient = (*Connection)(nil)
+var _ _postgres.GormClient = (*Connection)(nil)
 
 // Connection implements the GormClient interface
 type Connection struct {
 	db     *gorm.DB
 	sqlDB  *sql.DB
-	config *_config.GormConfig
+	config *_postgres.GormConfig
 }
 
 // NewConnection creates a new GORM connection
-func NewConnection(cfg *_config.GormConfig) *Connection {
+func NewConnection(cfg *_postgres.GormConfig) *Connection {
 	return &Connection{
 		config: cfg,
 	}
@@ -152,13 +151,13 @@ func (c *Connection) GetDB() *gorm.DB {
 }
 
 // Stats returns connection statistics
-func (c *Connection) Stats() interfaces.ConnectionStats {
+func (c *Connection) Stats() _postgres.ConnectionStats {
 	if c.sqlDB == nil {
-		return interfaces.ConnectionStats{}
+		return _postgres.ConnectionStats{}
 	}
 
 	stats := c.sqlDB.Stats()
-	return interfaces.ConnectionStats{
+	return _postgres.ConnectionStats{
 		OpenConnections:   stats.OpenConnections,
 		InUseConnections:  stats.InUse,
 		IdleConnections:   stats.Idle,

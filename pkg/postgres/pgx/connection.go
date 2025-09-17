@@ -1,28 +1,27 @@
-package pgx
+package _pgx_postgres
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	_config "go-libs/pkg/database/postgres/config"
-	"go-libs/pkg/database/postgres/interfaces"
+	_postgres "go-libs/pkg/postgres"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var _ interfaces.PgxClient = (*Connection)(nil)
+var _ _postgres.PgxClient = (*Connection)(nil)
 
 // Connection implements the PgxClient interface
 type Connection struct {
 	pool   *pgxpool.Pool
 	conn   *pgx.Conn
-	config *_config.Config
+	config *_postgres.Config
 }
 
 // NewConnection creates a new pgx connection
-func NewConnection(cfg *_config.Config) *Connection {
+func NewConnection(cfg *_postgres.Config) *Connection {
 	return &Connection{
 		config: cfg,
 	}
@@ -144,13 +143,13 @@ func (c *Connection) GetConn() *pgx.Conn {
 }
 
 // Stats returns connection statistics
-func (c *Connection) Stats() interfaces.ConnectionStats {
+func (c *Connection) Stats() _postgres.ConnectionStats {
 	if c.pool == nil {
-		return interfaces.ConnectionStats{}
+		return _postgres.ConnectionStats{}
 	}
 
 	stats := c.pool.Stat()
-	return interfaces.ConnectionStats{
+	return _postgres.ConnectionStats{
 		OpenConnections:   int(stats.TotalConns()),
 		InUseConnections:  int(stats.AcquiredConns()),
 		IdleConnections:   int(stats.IdleConns()),

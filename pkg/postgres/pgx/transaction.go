@@ -1,9 +1,9 @@
-package pgx
+package _pgx_postgres
 
 import (
 	"context"
 
-	"go-libs/pkg/database/postgres/interfaces"
+	_postgres "go-libs/pkg/postgres"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -31,7 +31,7 @@ func (t *Transaction) Exec(ctx context.Context, query string, args ...any) error
 }
 
 // Query executes a query and returns rows within transaction
-func (t *Transaction) Query(ctx context.Context, query string, args ...any) (interfaces.Rows, error) {
+func (t *Transaction) Query(ctx context.Context, query string, args ...any) (_postgres.Rows, error) {
 	rows, err := t.tx.Query(t.ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (t *Transaction) Query(ctx context.Context, query string, args ...any) (int
 }
 
 // QueryRow executes a query and returns a single row within transaction
-func (t *Transaction) QueryRow(ctx context.Context, query string, args ...any) interfaces.Row {
+func (t *Transaction) QueryRow(ctx context.Context, query string, args ...any) _postgres.Row {
 	row := t.tx.QueryRow(t.ctx, query, args...)
 	return &RowWrapper{row: row}
 }

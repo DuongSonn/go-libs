@@ -1,10 +1,10 @@
-package gorm
+package _pgx_postgres
 
-import "database/sql"
+import "github.com/jackc/pgx/v5"
 
-// RowsWrapper wraps sql.Rows to implement interfaces.Rows
+// RowsWrapper wraps pgx.Rows to implement interfaces.Rows
 type RowsWrapper struct {
-	rows *sql.Rows
+	rows pgx.Rows
 }
 
 func (r *RowsWrapper) Next() bool {
@@ -16,16 +16,17 @@ func (r *RowsWrapper) Scan(dest ...any) error {
 }
 
 func (r *RowsWrapper) Close() error {
-	return r.rows.Close()
+	r.rows.Close()
+	return nil
 }
 
 func (r *RowsWrapper) Err() error {
 	return r.rows.Err()
 }
 
-// RowWrapper wraps sql.Row to implement interfaces.Row
+// RowWrapper wraps pgx.Row to implement interfaces.Row
 type RowWrapper struct {
-	row *sql.Row
+	row pgx.Row
 }
 
 func (r *RowWrapper) Scan(dest ...any) error {
