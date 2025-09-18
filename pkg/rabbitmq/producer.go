@@ -136,7 +136,7 @@ func (p *Producer) PublishWithID(ctx context.Context, body []byte, config Publis
 	}, nil
 }
 
-// PublishJSON publishes a JSON message to RabbitMQ
+// PublishJSON publishes a JSON message to RabbitMQô
 func (p *Producer) PublishJSON(ctx context.Context, body []byte, config PublishConfig) (*PublishResult, error) {
 	config.ContentType = "application/json"
 	return p.Publish(ctx, body, config)
