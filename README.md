@@ -17,6 +17,17 @@ Database connection and operation utilities for PostgreSQL with two implementati
 
 [Learn more](pkg/postgres/README.md)
 
+### Redis
+
+Redis connection utilities with support for multiple deployment models:
+
+-   **Single Node**: Simple Redis server connection
+-   **Cluster**: Support for Redis Cluster with multiple nodes
+-   **Sentinel**: High availability with Redis Sentinel
+-   **Master-Slave**: Read-write separation for both Cluster and Sentinel
+
+[Learn more](pkg/redis/README.md)
+
 ### Kafka
 
 Flexible Kafka client for consuming messages with custom processors:
@@ -56,6 +67,7 @@ go get github.com/DuongSonn/go-libs
 
 # Or install specific packages
 go get github.com/DuongSonn/go-libs/pkg/postgres
+go get github.com/DuongSonn/go-libs/pkg/redis
 go get github.com/DuongSonn/go-libs/pkg/kafka
 go get github.com/DuongSonn/go-libs/pkg/errors
 go get github.com/DuongSonn/go-libs/pkg/logger

@@ -86,6 +86,61 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+// MasterSlaveConfig holds configuration for master-slave setup
+type MasterSlaveConfig struct {
+	Master *Config `json:"master" yaml:"master"`
+	Slave  *Config `json:"slave" yaml:"slave"`
+
+	// Master-slave specific settings
+	UseSlaveConnection bool `json:"use_slave_connection" yaml:"use_slave_connection"`
+	SlaveReadOnly      bool `json:"slave_read_only" yaml:"slave_read_only"`
+
+	// Failover settings
+	AutoFailover        bool          `json:"auto_failover" yaml:"auto_failover"`
+	FailoverRetries     int           `json:"failover_retries" yaml:"failover_retries"`
+	FailoverInterval    time.Duration `json:"failover_interval" yaml:"failover_interval"`
+	HealthCheckEnabled  bool          `json:"health_check_enabled" yaml:"health_check_enabled"`
+	HealthCheckInterval time.Duration `json:"health_check_interval" yaml:"health_check_interval"`
+}
+
+// DefaultMasterSlaveConfig returns a master-slave configuration with sensible defaults
+func DefaultMasterSlaveConfig() *MasterSlaveConfig {
+	return &MasterSlaveConfig{
+		Master:              DefaultConfig(),
+		Slave:               DefaultConfig(),
+		UseSlaveConnection:  true,
+		SlaveReadOnly:       true,
+		AutoFailover:        true,
+		FailoverRetries:     3,
+		FailoverInterval:    5 * time.Second,
+		HealthCheckEnabled:  true,
+		HealthCheckInterval: 30 * time.Second,
+	}
+}
+
+// Validate checks if the master-slave configuration is valid
+func (c *MasterSlaveConfig) Validate() error {
+	if c.Master == nil {
+		return fmt.Errorf("master configuration is required")
+	}
+
+	if err := c.Master.Validate(); err != nil {
+		return fmt.Errorf("invalid master configuration: %w", err)
+	}
+
+	if c.UseSlaveConnection {
+		if c.Slave == nil {
+			return fmt.Errorf("slave configuration is required when use_slave_connection is true")
+		}
+
+		if err := c.Slave.Validate(); err != nil {
+			return fmt.Errorf("invalid slave configuration: %w", err)
+		}
+	}
+
+	return nil
+}
+
 // GormConfig holds GORM-specific configuration
 type GormConfig struct {
 	*Config
@@ -107,5 +162,65 @@ func DefaultGormConfig() *GormConfig {
 		SkipDefaultTransaction:                   false,
 		PrepareStmt:                              true,
 		DisableForeignKeyConstraintWhenMigrating: false,
+	}
+}
+
+// GormMasterSlaveConfig holds GORM-specific configuration for master-slave setup
+type GormMasterSlaveConfig struct {
+	*MasterSlaveConfig
+
+	// GORM-specific settings for master
+	MasterLogLevel                                 int           `json:"master_log_level" yaml:"master_log_level"`
+	MasterSlowThreshold                            time.Duration `json:"master_slow_threshold" yaml:"master_slow_threshold"`
+	MasterSkipDefaultTransaction                   bool          `json:"master_skip_default_transaction" yaml:"master_skip_default_transaction"`
+	MasterPrepareStmt                              bool          `json:"master_prepare_stmt" yaml:"master_prepare_stmt"`
+	MasterDisableForeignKeyConstraintWhenMigrating bool          `json:"master_disable_foreign_key_constraint_when_migrating" yaml:"master_disable_foreign_key_constraint_when_migrating"`
+
+	// GORM-specific settings for slave
+	SlaveLogLevel                                 int           `json:"slave_log_level" yaml:"slave_log_level"`
+	SlaveSlowThreshold                            time.Duration `json:"slave_slow_threshold" yaml:"slave_slow_threshold"`
+	SlaveSkipDefaultTransaction                   bool          `json:"slave_skip_default_transaction" yaml:"slave_skip_default_transaction"`
+	SlavePrepareStmt                              bool          `json:"slave_prepare_stmt" yaml:"slave_prepare_stmt"`
+	SlaveDisableForeignKeyConstraintWhenMigrating bool          `json:"slave_disable_foreign_key_constraint_when_migrating" yaml:"slave_disable_foreign_key_constraint_when_migrating"`
+}
+
+// DefaultGormMasterSlaveConfig returns GORM master-slave configuration with sensible defaults
+func DefaultGormMasterSlaveConfig() *GormMasterSlaveConfig {
+	return &GormMasterSlaveConfig{
+		MasterSlaveConfig:                              DefaultMasterSlaveConfig(),
+		MasterLogLevel:                                 1, // Silent
+		MasterSlowThreshold:                            200 * time.Millisecond,
+		MasterSkipDefaultTransaction:                   false,
+		MasterPrepareStmt:                              true,
+		MasterDisableForeignKeyConstraintWhenMigrating: false,
+		SlaveLogLevel:                                  1, // Silent
+		SlaveSlowThreshold:                             200 * time.Millisecond,
+		SlaveSkipDefaultTransaction:                    true, // Typically true for read-only connections
+		SlavePrepareStmt:                               true,
+		SlaveDisableForeignKeyConstraintWhenMigrating:  false,
+	}
+}
+
+// GetMasterGormConfig returns GORM configuration for the master
+func (c *GormMasterSlaveConfig) GetMasterGormConfig() *GormConfig {
+	return &GormConfig{
+		Config:                                   c.Master,
+		LogLevel:                                 c.MasterLogLevel,
+		SlowThreshold:                            c.MasterSlowThreshold,
+		SkipDefaultTransaction:                   c.MasterSkipDefaultTransaction,
+		PrepareStmt:                              c.MasterPrepareStmt,
+		DisableForeignKeyConstraintWhenMigrating: c.MasterDisableForeignKeyConstraintWhenMigrating,
+	}
+}
+
+// GetSlaveGormConfig returns GORM configuration for the slave
+func (c *GormMasterSlaveConfig) GetSlaveGormConfig() *GormConfig {
+	return &GormConfig{
+		Config:                                   c.Slave,
+		LogLevel:                                 c.SlaveLogLevel,
+		SlowThreshold:                            c.SlaveSlowThreshold,
+		SkipDefaultTransaction:                   c.SlaveSkipDefaultTransaction,
+		PrepareStmt:                              c.SlavePrepareStmt,
+		DisableForeignKeyConstraintWhenMigrating: c.SlaveDisableForeignKeyConstraintWhenMigrating,
 	}
 }

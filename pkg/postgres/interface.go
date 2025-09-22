@@ -23,6 +23,20 @@ type DatabaseClient interface {
 	BeginTx(ctx context.Context) (Transaction, error)
 }
 
+// MasterSlaveClient defines the interface for master-slave database operations
+type MasterSlaveClient interface {
+	DatabaseClient
+
+	// Master-slave specific methods
+	GetMasterClient() DatabaseClient
+	GetSlaveClient() DatabaseClient
+	HasSlaveConnected() bool
+
+	// Role information
+	IsMaster() bool
+	IsSlave() bool
+}
+
 // Transaction interface for transaction operations
 type Transaction interface {
 	Commit() error
@@ -71,6 +85,16 @@ type GormClient interface {
 	GetDB() *gorm.DB // Returns *gorm.DB
 }
 
+// GormMasterSlaveClient extends GormClient with master-slave support
+type GormMasterSlaveClient interface {
+	GormClient
+	MasterSlaveClient
+
+	// GORM-specific master-slave methods
+	GetMasterDB() *gorm.DB
+	GetSlaveDB() *gorm.DB
+}
+
 // PgxClient extends DatabaseClient with pgx-specific operations
 type PgxClient interface {
 	DatabaseClient
@@ -82,4 +106,14 @@ type PgxClient interface {
 	InsertModel(ctx context.Context, model any) error
 	UpsertModel(ctx context.Context, model any, primaryKeys ...string) error
 	BatchInsertModel(ctx context.Context, models []any, batchSize int) error
+}
+
+// PgxMasterSlaveClient extends PgxClient with master-slave support
+type PgxMasterSlaveClient interface {
+	PgxClient
+	MasterSlaveClient
+
+	// pgx-specific master-slave methods
+	GetMasterPool() *pgxpool.Pool
+	GetSlavePool() *pgxpool.Pool
 }
