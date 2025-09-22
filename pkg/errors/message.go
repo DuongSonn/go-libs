@@ -118,6 +118,11 @@ func NewErrorRegistry() *ErrorRegistry {
 
 // Register registers an ErrorMessage
 func (r *ErrorRegistry) Register(message *ErrorMessage) {
+	// Check if message with same code already exists
+	if _, ok := r.messages[message.code]; ok {
+		fmt.Printf("Warning: Error message with code %d already exists\n", message.code)
+	}
+
 	r.messages[message.code] = message
 }
 
